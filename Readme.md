@@ -5,22 +5,28 @@ This is an implementation of a "vector space model" with "Porter stemming", "dou
 
 ## Example
 
-	var Search = require('./../lib/Search').Search;
+	var NodeSearch = require('./../lib/node-search').NodeSearch;
 	var nStore = require('./lib/nstore');
 
 	// A simple data set to search over, feel free to use any data source, nstore uses JavaScript objects so it's simple
 	var db = nStore('data/example.db');
 
-	db.all(null,function (err, docs, metas) {
-	  if (err) throw err;
-		var s = new Search();
-		s.fieldWeights.title = 5;
-		s.index(docs); // Create a search index, this should only be done when app loads or data changes
-		var terms = "meet !poultry";
-		var results = s.query(terms,["title"]); // search only the title field 
-		for(var i=0;i<results.length;i++){
-			console.log(results[i].id+" "+docs[results[i].id].title +" "+  results[i].rank);
-		}
+	var search = new NodeSearch();
+	search.fieldWeights.title = 2; // Make one/or many of the document fields more important
+	var stream = db.stream();
+	stream.addListener('data', function (doc, meta) {
+		search.index(meta.key,doc);
+	});
+
+	stream.addListener('end', function () { // when the indexing is finished
+		search.query("meet !poultry", null, function (results) { // search and wait for the results
+			results.forEach(function(result){
+				db.get(result.key, function (err, doc, meta) { 
+					if(err) throw err;
+					console.log(result.key+" "+doc.title +" "+doc.body +" "+  result.rank);
+				});
+			});
+		});
 	});
 
 	
