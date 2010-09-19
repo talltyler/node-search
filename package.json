@@ -2,5 +2,5 @@
 	"name": "node-search",
 	"version": "0.0.1",
 	"directories": {"lib": "./lib"},
-	"main": "./lib/search",
+	"main": "./lib/node-search",
 }
