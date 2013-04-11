@@ -1,8 +1,8 @@
 var NodeSearch = require('./../lib/node-search').NodeSearch;
-var nStore = require('./lib/nstore');
+var nStore = require('./lib/nstore/lib/nstore.js');
 
 // A simple data set to search over, feel free to use any data source, nstore uses JavaScript objects so it's simple
-var db = nStore('data/example.db');
+var db = nStore('./data/example.db');
 
 var search = new NodeSearch();
 search.fieldWeights.title = 2; // Make one/or many of the document fields more important
